@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const userId = params.userId;
+    const { userId } = await params;
+
     const user = await getUserDocument(userId);
 
     if (!user) {
@@ -22,8 +23,12 @@ export async function GET(
     });
   } catch (error) {
     console.error('Error fetching user:', error);
+
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch user' },
+      {
+        success: false,
+        error: 'Failed to fetch user',
+      },
       { status: 500 }
     );
   }
